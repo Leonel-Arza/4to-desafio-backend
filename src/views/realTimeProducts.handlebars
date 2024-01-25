@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productos en Tiempo Real</title>
+</head>
+
+<body>
+    <h1>Lista de Productos en Tiempo Real</h1>
+    <ul id="realTimeProductsList">
+        {{#each productos}}
+        <li>{{this.nombre}} - ${{this.precio}} <button onclick="eliminarProducto('{{this.nombre}}')">Eliminar</button>
+        </li>
+        {{/each}}
+    </ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+
+        socket.on('nuevoProducto', (nuevoProducto) => {
+            // Actualizar la lista de productos en tiempo real
+            const listaProductos = document.getElementById('realTimeProductsList');
+            const nuevoElemento = document.createElement('li');
+            nuevoElemento.textContent = `${nuevoProducto.nombre} - $${nuevoProducto.precio}`;
+            listaProductos.appendChild(nuevoElemento);
+        });
+
+        socket.on('productoEliminado', (productoEliminado) => {
+            // Actualizar la lista de productos en tiempo real al eliminar un producto
+            const listaProductos = document.getElementById('realTimeProductsList');
+            const elementosProductos = listaProductos.getElementsByTagName('li');
+
+            // Buscar y eliminar el elemento correspondiente al producto eliminado
+            for (let i = 0; i < elementosProductos.length; i++) {
+                const textoProducto = elementosProductos[i].textContent;
+                if (textoProducto.includes(productoEliminado.nombre)) {
+                    elementosProductos[i].remove();
+                    break;
+                }
+            }
+        });
+
+        function eliminarProducto(nombre) {
+            // Emitir evento para eliminar producto por nombre
+            socket.emit('eliminarProducto', { nombre });
+        }
+    </script>
+</body>
+
+</html>

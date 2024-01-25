@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productos</title>
+</head>
+
+<body>
+    <h1>Lista de Productos</h1>
+    <ul>
+        {{#each productos}}
+        <li>{{this.nombre}} - ${{this.precio}}</li>
+        {{/each}}
+    </ul>
+
+    <form action="/agregarProducto" method="post">
+        <label for="nombre">Nombre:</label>
+        <input type="text" name="nombre" required>
+
+        <label for="precio">Precio:</label>
+        <input type="number" name="precio" required>
+
+        <button type="submit">Agregar Producto</button>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('nuevoProducto', (nuevoProducto) => {
+            // Actualizar la lista de productos en tiempo real
+            const listaProductos = document.querySelector('ul');
+            const nuevoElemento = document.createElement('li');
+            nuevoElemento.textContent = `${nuevoProducto.nombre} - $${nuevoProducto.precio}`;
+            listaProductos.appendChild(nuevoElemento);
+        });
+    </script>
+</body>
+
+</html>
